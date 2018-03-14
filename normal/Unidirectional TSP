@@ -1,0 +1,81 @@
+package algorithm_formal;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Unidirectional TSP {
+	static int indx;
+	public static void main(String[] args) {
+		Scanner sc=new Scanner(System.in);
+		ArrayList<String> path = new ArrayList<String>();
+		ArrayList<Integer> ans = new ArrayList<Integer>();
+		while(sc.hasNextLine()){
+			int m;
+			try {
+				m = sc.nextInt();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				break;
+			}
+			int n = sc.nextInt();
+			int[][] G = new int[m][n];
+			int[][] next = new int[m][n];
+			String p="";
+			for(int i = 0; i < m; i++){
+				for(int j = 0; j < n; j++){
+					G[i][j] = sc.nextInt();
+				}
+			}
+			int[][] dp = new int[m][n];
+			for(int i = 0; i < m; i++){
+				dp[i][n-1] = G[i][n-1];
+			}
+			for(int i = 0; i < m; i++){
+				next[i][n-1] = -1;
+			}
+			for(int j = n - 2; j >= 0; j--){//从第i行第j列出发
+				for(int i = 0; i < m; i++){
+					dp[i][j] = G[i][j] + min(dp[i-1>=0?i-1:m-1][j+1],dp[i][j+1],
+							dp[i+1<m?i+1:0][j+1]);
+					if(i==0 && indx==-1){
+						if(dp[m-1][j+1]==dp[0][j+1]) indx=0;
+						else if(dp[m-1][j+1]==dp[1][j+1]) indx=1;
+					}
+					if(i==m-1 && indx!=1){
+						if(dp[i][j]-G[i][j] == dp[0][j+1]) indx=1;
+					}
+					int tmp = i + indx;
+					if(tmp < 0) tmp = m - 1;
+					if(tmp >= m) tmp = 0;
+					next[i][j] = tmp;//i,j的前一项是第j-1列的第i+indx行
+				}
+			}
+			int min = dp[0][0];indx = 0;
+			for(int i = 1; i < m; i++){
+				if(min > dp[i][0]) {min = dp[i][0];indx = i;}
+			}
+			ans.add(min);
+			p = (indx+1)+"";
+			indx = next[indx][0];
+			for(int j = 1; j < n; j++){
+				p += " " + (indx+1);
+				indx = next[indx][j];
+			}
+			path.add(p);
+		}
+		sc.close();
+		int n = ans.size();
+		for(int i = 0; i < n; i++){
+			System.out.println(path.get(i));
+			System.out.println(ans.get(i));
+		}
+	}
+
+	private static int min(int i, int j, int k) {
+		// TODO Auto-generated method stub
+		int min = i;indx = -1;
+		if(j < min) {min = j;indx = 0;}
+		if(k < min) {min = k;indx = 1;}
+		return min;
+	}
+}
